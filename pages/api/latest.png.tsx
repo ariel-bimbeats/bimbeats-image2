@@ -4,8 +4,7 @@ export const config = { runtime: 'edge' }; // run at Vercel's edge
 
 export default async function handler() {
   // 1 ─ fetch your bullets from WordPress
-  const src = process.env.BULLET_SRC!;
-  const res = await fetch(`${src}${src.includes('?') ? '&' : '?'}t=${Date.now()}`, { cache: 'no-store' });
+  const res = await fetch(process.env.BULLET_SRC!);
 
   if (!res.ok) return new Response('Feed error', { status: 500 });
 
