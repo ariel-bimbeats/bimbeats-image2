@@ -15,7 +15,7 @@ export default async function handler() {
       <div
         style={{
           width: 1200,
-          height: 500,
+          height: 628,
           background: '#ffffff',
           fontFamily: 'Helvetica, Arial, sans-serif',
           padding: 60,
