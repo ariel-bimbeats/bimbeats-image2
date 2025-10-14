@@ -15,16 +15,16 @@ export default async function handler() {
       <div
         style={{
           width: 1200,
-          height: 628,
+          height: 500,
           background: '#ffffff',
           fontFamily: 'Helvetica, Arial, sans-serif',
           padding: 60,
-          color: '#00b3b3',              // Tech Teal
+          color: '#00b3b3',
           fontSize: 44,
           lineHeight: 1.35,
           display: 'flex',
           flexDirection: 'column',
-          gap: 24                          // space between lines
+          gap: 24
         }}
       >
         {bullets.map((t) => (
