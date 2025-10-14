@@ -16,16 +16,16 @@ export default async function handler() {
       <div
         style={{
           width: 1200,
-          height: 628,
+          height: 500,
           background: '#ffffff',
           fontFamily: 'Helvetica, Arial, sans-serif',
-          padding: 60,
+          padding: 20,
           color: '#00b3b3',
           fontSize: 44,
           lineHeight: 1.35,
           display: 'flex',
           flexDirection: 'column',
-          gap: 24
+          gap: 12
         }}
       >
         {bullets.map((t) => (
@@ -38,7 +38,7 @@ export default async function handler() {
     ),
     {
       width: 1200,
-      height: 628,
+      height: 500,
       headers: { 'Cache-Control': 'no-store' } // never cache
     }
   );
