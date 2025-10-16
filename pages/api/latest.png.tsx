@@ -6,8 +6,8 @@ export const config = { runtime: 'edge' }; // Vercel edge runtime
 const WIDTH = 1200;
 const HEIGHT = 340;
 const PADDING = 20;
-const MIN_FONT = 36;
-const MAX_FONT = 56;
+const MIN_FONT = 24;
+const MAX_FONT = 48;
 const LINE_HEIGHT = 1.3;
 const CHAR_WIDTH_FACTOR = 0.55;
 
