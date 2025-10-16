@@ -4,7 +4,7 @@ export const config = { runtime: 'edge' }; // Vercel edge runtime
 
 // Canvas + layout knobs
 const WIDTH = 1200;
-const HEIGHT = 500;
+const HEIGHT = 340;
 const PADDING = 20;          // 20px padding all around
 const MIN_FONT = 18;         // px
 const MAX_FONT = 44;         // px
