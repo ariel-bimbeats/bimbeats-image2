@@ -5,11 +5,11 @@ export const config = { runtime: 'edge' }; // Vercel edge runtime
 // Canvas + layout knobs
 const WIDTH = 1200;
 const HEIGHT = 340;
-const PADDING = 20;          // 20px padding all around
-const MIN_FONT = 24;         // px
-const MAX_FONT = 56;         // px
-const LINE_HEIGHT = 1.3;     // multiplier
-const CHAR_WIDTH_FACTOR = 0.55; // rough Helvetica width (px per char = fontSize * factor)
+const PADDING = 20;
+const MIN_FONT = 36;
+const MAX_FONT = 56;
+const LINE_HEIGHT = 1.3;
+const CHAR_WIDTH_FACTOR = 0.55;
 
 export default async function handler() {
   // 1) fetch bullets
