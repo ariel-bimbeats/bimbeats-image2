@@ -1,6 +1,6 @@
 import { ImageResponse } from '@vercel/og';
 
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'edge' }; // Vercel edge runtime
 
 // Canvas + layout knobs
 const WIDTH = 1200;
@@ -14,7 +14,10 @@ const CHAR_WIDTH_FACTOR = 0.55;
 export default async function handler() {
   // 1) fetch bullets
   const src = process.env.BULLET_SRC!;
-  const res = await fetch(`${src}${src.includes('?') ? '&' : '?'}t=${Date.now()}`, { cache: 'no-store' });
+  const res = await fetch(
+    `${src}${src.includes('?') ? '&' : '?'}t=${Date.now()}`,
+    { cache: 'no-store' }
+  );
   if (!res.ok) return new Response('Feed error', { status: 500 });
 
   const { bullets = [] } = (await res.json()) as { bullets: string[] };
@@ -29,13 +32,13 @@ export default async function handler() {
 
   const fits = (fs: number) => {
     // vertical fit
-    const gap = Math.round(fs * 0.5);                 // space between rows
-    const lineBox = fs * LINE_HEIGHT;                 // row height
+    const gap = Math.round(fs * 0.5);         // space between rows
+    const lineBox = fs * LINE_HEIGHT;         // row height
     const neededH = items.length * lineBox + Math.max(0, items.length - 1) * gap;
     if (neededH > contentH) return false;
 
     // horizontal fit (approximate)
-    const gutter = Math.round(fs * 2.0);              // dot + spacing area
+    const gutter = Math.round(fs * 2.0);      // dot + spacing area
     const textW = longestLen * (fs * CHAR_WIDTH_FACTOR);
     const neededW = gutter + textW;
     return neededW <= contentW;
@@ -50,7 +53,7 @@ export default async function handler() {
   const gap = Math.round(fontSize * 0.5);
   const bulletDotSize = Math.round(fontSize * 1.2);
   const gutter = Math.round(fontSize * 2.0);
-  const maxTextWidth = contentW - gutter; // for safety if a line is insanely long
+  const maxTextWidth = contentW - gutter; // safety if a line is insanely long
 
   // 3) render image
   return new ImageResponse(
@@ -85,8 +88,8 @@ export default async function handler() {
                   lineHeight: LINE_HEIGHT,
                   flex: 1,
                   maxWidth: maxTextWidth,
-                  wordBreak: 'break-word',        // last-resort wrap
-                  overflow: 'hidden'              // prevent OG quirks
+                  wordBreak: 'break-word', // last-resort wrap
+                  overflow: 'hidden'       // prevent OG quirks
                 }}
               >
                 {t}
