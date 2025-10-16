@@ -11,10 +11,94 @@ const MAX_FONT = 56;
 const LINE_HEIGHT = 1.3;
 const CHAR_WIDTH_FACTOR = 0.55;
 
+// Minimal inline Markdown renderer: **bold**, *italic*, `code`, \n line breaks, [text](url)
+function renderInline(md: string): (string | JSX.Element)[] {
+  const out: (string | JSX.Element)[] = [];
+  const lines = md.split('\n');
+
+  lines.forEach((line, li) => {
+    // Convert links to tokens first so we can style after bold/italic
+    const tokenized = line.replace(
+      /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
+      '[[LINK:$2::$1]]'
+    );
+
+    // Split by inline code
+    const codeParts = tokenized.split(/`([^`]+)`/);
+    for (let i = 0; i < codeParts.length; i++) {
+      const seg = codeParts[i];
+      if (i % 2 === 1) {
+        out.push(
+          <span
+            key={`code-${li}-${i}`}
+            style={{
+              fontFamily: 'Menlo, Consolas, monospace',
+              padding: '0 6px',
+              borderRadius: 4,
+              background: '#f2f2f2'
+            }}
+          >
+            {seg}
+          </span>
+        );
+        continue;
+      }
+
+      // Handle **bold**
+      const boldParts = seg.split(/\*\*([^*]+)\*\*/);
+      for (let j = 0; j < boldParts.length; j++) {
+        const bseg = boldParts[j];
+        if (j % 2 === 1) {
+          out.push(
+            <strong key={`b-${li}-${i}-${j}`} style={{ fontWeight: 800, color: '#111' }}>
+              {bseg}
+            </strong>
+          );
+          continue;
+        }
+
+        // Handle *italic*
+        const italParts = bseg.split(/\*([^*]+)\*/);
+        for (let k = 0; k < italParts.length; k++) {
+          const iseg = italParts[k];
+          if (k % 2 === 1) {
+            out.push(<em key={`i-${li}-${i}-${j}-${k}`}>{iseg}</em>);
+            continue;
+          }
+
+          // Resolve link tokens back into styled spans
+          const linkParts = iseg.split(/\[\[LINK:([^:]+)::([^\]]+)]]/);
+          for (let m = 0; m < linkParts.length; m++) {
+            if (m % 3 === 0) {
+              if (linkParts[m]) out.push(linkParts[m]);
+            } else if (m % 3 === 1) {
+              const url = linkParts[m];
+              const txt = linkParts[m + 1] ?? url;
+              out.push(
+                <span key={`a-${li}-${i}-${j}-${k}-${m}`} style={{ textDecoration: 'underline' }}>
+                  {txt}
+                </span>
+              );
+              m += 1; // skip the consumed text token
+            }
+          }
+        }
+      }
+    }
+
+    if (li < lines.length - 1) out.push(<br key={`br-${li}`} />);
+  });
+
+  return out;
+}
+
 export default async function handler() {
   // 1) fetch bullets
   const src = process.env.BULLET_SRC!;
-  const res = await fetch(`${src}${src.includes('?') ? '&' : '?'}t=${Date.now()}`, { cache: 'no-store' });
+  const res = await fetch(
+    `${src}${src.includes('?') ? '&' : '?'}t=${Date.now()}`,
+    { cache: 'no-store' }
+  );
   if (!res.ok) return new Response('Feed error', { status: 500 });
 
   const { bullets = [] } = (await res.json()) as { bullets: string[] };
@@ -29,13 +113,13 @@ export default async function handler() {
 
   const fits = (fs: number) => {
     // vertical fit
-    const gap = Math.round(fs * 0.5);                 // space between rows
-    const lineBox = fs * LINE_HEIGHT;                 // row height
+    const gap = Math.round(fs * 0.5); // space between rows
+    const lineBox = fs * LINE_HEIGHT; // row height
     const neededH = items.length * lineBox + Math.max(0, items.length - 1) * gap;
     if (neededH > contentH) return false;
 
     // horizontal fit (approximate)
-    const gutter = Math.round(fs * 2.0);              // dot + spacing area
+    const gutter = Math.round(fs * 2.0); // dot + spacing area
     const textW = longestLen * (fs * CHAR_WIDTH_FACTOR);
     const neededW = gutter + textW;
     return neededW <= contentW;
@@ -43,7 +127,10 @@ export default async function handler() {
 
   let fontSize = MIN_FONT;
   for (let fs = MAX_FONT; fs >= MIN_FONT; fs--) {
-    if (fits(fs)) { fontSize = fs; break; }
+    if (fits(fs)) {
+      fontSize = fs;
+      break;
+    }
   }
 
   // final derived metrics
@@ -72,12 +159,14 @@ export default async function handler() {
             display: 'flex',
             flexDirection: 'column',
             gap,
-            // constrain the column so long words can wrap instead of cropping
             width: contentW
           }}
         >
           {items.map((t, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: Math.round(fontSize * 0.7) }}>
+            <div
+              key={i}
+              style={{ display: 'flex', alignItems: 'flex-start', gap: Math.round(fontSize * 0.7) }}
+            >
               <span style={{ fontSize: bulletDotSize, lineHeight: 1 }}>•</span>
               <span
                 style={{
@@ -85,11 +174,12 @@ export default async function handler() {
                   lineHeight: LINE_HEIGHT,
                   flex: 1,
                   maxWidth: maxTextWidth,
-                  wordBreak: 'break-word',        // last-resort wrap
-                  overflow: 'hidden'              // prevent OG quirks
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
+                  overflow: 'hidden'
                 }}
               >
-                {t}
+                {renderInline(t)}
               </span>
             </div>
           ))}
