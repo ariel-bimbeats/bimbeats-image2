@@ -1,8 +1,7 @@
 {
   "bullets": [
-    "Bimbeats 2.1.0.0 is out! Visit freshdesk for the latest download files.",
+    "Bimbeats 2.2.0.0 is out! Visit freshdesk for the latest download files.",
     "Contact support to schedule a guided deployment call.",
-    "You will need to update Elastic to 9.2.3 or later.",
-    "Please use Elastic's Upgrade Assistant before upgrading. Visit Freshdesk to learn more"
+    "You will need to update Elastic to 9.3.4 or later."
   ]
 }
